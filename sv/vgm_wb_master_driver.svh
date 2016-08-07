@@ -14,6 +14,33 @@
 
 
 class master_driver extends uvm_driver #(sequence_item);
+  virtual vgm_wb_master_interface intf;
+
+
+  virtual task run_phase(uvm_phase phase);
+    forever begin
+      seq_item_port.get_next_item(req);
+      drive();
+      seq_item_port.item_done();
+    end
+  endtask
+
+
+  virtual protected task drive();
+    repeat (req.delay)
+      @(posedge intf.CLK_I);
+
+    intf.CYC_O <= 1;
+    intf.STB_O <= 1;
+    intf.WE_O <= req.direction;
+    intf.ADR_O <= req.address;
+
+    @(posedge intf.CLK_I iff intf.ACK_I);
+    intf.CYC_O <= 0;
+    intf.STB_O <= 0;
+  endtask
+
+
   function new(string name, uvm_component parent);
     super.new(name, parent);
   endfunction
