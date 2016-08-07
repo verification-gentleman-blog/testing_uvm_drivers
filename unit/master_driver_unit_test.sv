@@ -22,6 +22,8 @@ module master_driver_unit_test;
   import svunit_uvm_mock_pkg::*;
   `include "svunit_defines.svh"
 
+  import vgm_svunit_utils::*;
+
   string name = "master_driver_ut";
   svunit_testcase svunit_ut;
 
@@ -31,7 +33,7 @@ module master_driver_unit_test;
   master_driver driver;
 
 
-  uvm_sequencer #(sequence_item) sequencer;
+  sequencer_stub #(sequence_item) sequencer;
 
   bit rst = 1;
   bit clk;
@@ -72,10 +74,7 @@ module master_driver_unit_test;
 
     `SVTEST(cyc_and_stb_driven)
       sequence_item item = new("item");
-
-      fork
-        sequencer.execute_item(item);
-      join_none
+      sequencer.add_item(item);
 
       @(posedge clk);
       `FAIL_UNLESS(intf.CYC_O === 1)
@@ -86,10 +85,7 @@ module master_driver_unit_test;
     `SVTEST(cyc_and_stb_driven_with_delay)
       sequence_item item = new("item");
       item.delay = 3;
-
-      fork
-        sequencer.execute_item(item);
-      join_none
+      sequencer.add_item(item);
 
       repeat (3) begin
         @(posedge clk);
@@ -107,10 +103,7 @@ module master_driver_unit_test;
       sequence_item item = new("item");
       item.direction = READ;
       item.address = 'haabb_ccdd;
-
-      fork
-        sequencer.execute_item(item);
-      join_none
+      sequencer.add_item(item);
 
       @(posedge clk);
       `FAIL_UNLESS(intf.WE_O === 0)
@@ -122,10 +115,7 @@ module master_driver_unit_test;
       sequence_item item = new("item");
       item.direction = WRITE;
       item.address = 'h1122_3344;
-
-      fork
-        sequencer.execute_item(item);
-      join_none
+      sequencer.add_item(item);
 
       @(posedge clk);
       `FAIL_UNLESS(intf.WE_O === 1)
@@ -136,10 +126,7 @@ module master_driver_unit_test;
     `SVTEST(transfer_held_until_ack)
       sequence_item item = new("item");
       intf.ACK_I <= 0;
-
-      fork
-        sequencer.execute_item(item);
-      join_none
+      sequencer.add_item(item);
 
       repeat (3) begin
         @(posedge clk);
@@ -157,10 +144,7 @@ module master_driver_unit_test;
     `SVTEST(idle_after_ack)
       sequence_item item = new("item");
       intf.ACK_I <= 0;
-
-      fork
-        sequencer.execute_item(item);
-      join_none
+      sequencer.add_item(item);
 
       repeat (5)
         @(posedge clk);

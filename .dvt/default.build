@@ -6,6 +6,11 @@ dependencies/svunit/svunit_base/svunit_pkg.sv
 -incdir dependencies/svunit/svunit_base/uvm-mock
 dependencies/svunit/svunit_base/uvm-mock/svunit_uvm_mock_pkg.sv
 
+-incdir dependencies/vgm_svunit_utils/sv
+dependencies/vgm_svunit_utils/sv/*.sv
 
 -incdir sv
 sv/*.sv
+
+-incdir unit
+unit/*.sv
